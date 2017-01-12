@@ -18,22 +18,15 @@ class ProjectView extends FuzzyFinderView
     @disposables = new CompositeDisposable
     @reloadPaths = false if @paths?.length > 0
     @watchedPaths = []
-    @canWatchPath = process.platform != 'linux'
 
-    if @canWatchPath
-      @setupPackagePathWatchers()
-    else
-      window.addEventListener('focus', @queueReload)
-
-    @disposables.add new Disposable -> window.removeEventListener('focus', windowFocused)
+    @setupPackagePathWatchers()
 
     @subscribeToConfig()
 
     @disposables.add atom.project.onDidChangePaths =>
       @reloadPaths = true
       @paths = null
-      if @canWatchPath
-        @setupPackagePathWatchers()
+      @setupPackagePathWatchers()
 
   setupPackagePathWatchers: ->
     for watcher in @watchedPaths
@@ -54,7 +47,7 @@ class ProjectView extends FuzzyFinderView
     if @paths?
         @reloadPaths = true
     else
-      # The window gained focused while the first task was still running
+      # The update happened while the first task was still running
       # so let it complete but reload the paths on the next populate call.
       @reloadAfterFirstLoad = true
 
