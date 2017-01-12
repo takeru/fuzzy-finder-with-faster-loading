@@ -1,6 +1,7 @@
 {$} = require 'atom-space-pen-views'
 {Disposable, CompositeDisposable} = require 'atom'
 humanize = require 'humanize-plus'
+fs = require 'fs-plus'
 
 FuzzyFinderView = require './fuzzy-finder-view'
 PathLoader = require './path-loader'
@@ -16,16 +17,14 @@ class ProjectView extends FuzzyFinderView
 
     @disposables = new CompositeDisposable
     @reloadPaths = false if @paths?.length > 0
+    @watchedPaths = []
+    @canWatchPath = process.platform != 'linux'
 
-    windowFocused = =>
-      if @paths?
-        @reloadPaths = true
-      else
-        # The window gained focused while the first task was still running
-        # so let it complete but reload the paths on the next populate call.
-        @reloadAfterFirstLoad = true
+    if @canWatchPath
+      @setupPackagePathWatchers()
+    else
+      window.addEventListener('focus', @queueReload)
 
-    window.addEventListener('focus', windowFocused)
     @disposables.add new Disposable -> window.removeEventListener('focus', windowFocused)
 
     @subscribeToConfig()
@@ -33,6 +32,31 @@ class ProjectView extends FuzzyFinderView
     @disposables.add atom.project.onDidChangePaths =>
       @reloadPaths = true
       @paths = null
+      if @canWatchPath
+        @setupPackagePathWatchers()
+
+  setupPackagePathWatchers: ->
+    for watcher in @watchedPaths
+      watcher.close()
+    @watchedPaths = atom.project.getPaths().map((path) =>
+      fs.watch(
+        fs.realpathSync(path),
+        { recursive: true },
+        (eventType, fileName) => @projectFileChanged(eventType, fileName)
+      )
+    )
+
+  projectFileChanged: (eventType, fileName) -> 
+    if eventType != 'change'
+      @queueReload()
+
+  queueReload: ->
+    if @paths?
+        @reloadPaths = true
+    else
+      # The window gained focused while the first task was still running
+      # so let it complete but reload the paths on the next populate call.
+      @reloadAfterFirstLoad = true
 
   subscribeToConfig: ->
     @disposables.add atom.config.onDidChange 'fuzzy-finder.ignoredNames', =>
