@@ -2,6 +2,7 @@
 {Disposable, CompositeDisposable} = require 'atom'
 humanize = require 'humanize-plus'
 fs = require 'fs-plus'
+path = require 'path'
 
 FuzzyFinderView = require './fuzzy-finder-view'
 PathLoader = require './path-loader'
@@ -28,13 +29,16 @@ class ProjectView extends FuzzyFinderView
       @paths = null
       @setupPackagePathWatchers()
 
+    if !@paths
+      @tryLoadCachedProjectFiles()
+
   setupPackagePathWatchers: ->
     for watcher in @watchedPaths
       watcher.close()
-    @watchedPaths = atom.project.getPaths().map((path) =>
+    @watchedPaths = atom.project.getPaths().map((projectPath) =>
       fs.watch(
-        fs.realpathSync(path),
-        { recursive: true },
+        fs.realpathSync(projectPath),
+        { recursive: true, persistent: false },
         (eventType, fileName) => @projectFileChanged(eventType, fileName)
       )
     )
@@ -151,4 +155,26 @@ class ProjectView extends FuzzyFinderView
     @loadPathsTask?.terminate()
     @loadPathsTask = PathLoader.startTask (@paths) =>
       @reloadPaths = false
+      @saveProjectData()
       fn?()
+
+  getBaseSavePath: ->
+    packagePaths = atom.packages.getPackageDirPaths()
+    path.join(packagePaths[packagePaths.length - 1], 'fuzzy-finder-with-faster-loading', 'data')
+
+  getSavePath: (projectPath) ->
+    path.join(@getBaseSavePath(), projectPath.replace(/\W+/g, '_'))
+
+  saveProjectData: ->
+    if !@paths?.length
+      return
+    atom.project.getPaths().forEach (projectPath) =>
+      projectFilesPaths = @paths.filter((p) => p.startsWith projectPath)
+      fs.writeFile(@getSavePath(projectPath), JSON.stringify(projectFilesPaths), () => )
+
+  tryLoadCachedProjectFiles: ->
+    atom.project.getPaths().forEach (projectPath) =>
+      try
+        data = JSON.parse(fs.readFileSync(@getSavePath(projectPath), 'utf8'))
+        if data?.length
+          @paths = if @paths then @paths.concat(data) else data
