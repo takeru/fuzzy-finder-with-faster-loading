@@ -3,6 +3,7 @@
 humanize = require 'humanize-plus'
 fs = require 'fs-plus'
 path = require 'path'
+zlib = require 'zlib'
 
 FuzzyFinderView = require './fuzzy-finder-view'
 PathLoader = require './path-loader'
@@ -31,6 +32,8 @@ class ProjectView extends FuzzyFinderView
 
     if !@paths
       @tryLoadCachedProjectFiles()
+
+    @cleanupOldFiles()
 
   setupPackagePathWatchers: ->
     for watcher in @watchedPaths
@@ -170,11 +173,28 @@ class ProjectView extends FuzzyFinderView
       return
     atom.project.getPaths().forEach (projectPath) =>
       projectFilesPaths = @paths.filter((p) => p.startsWith projectPath)
-      fs.writeFile(@getSavePath(projectPath), JSON.stringify(projectFilesPaths), () => )
+      buffer = zlib.deflateSync(Buffer.from(JSON.stringify(projectFilesPaths)),
+        { level: zlib.Z_BEST_SPEED })
+      fs.writeFile(@getSavePath(projectPath), buffer, () => )
 
   tryLoadCachedProjectFiles: ->
     atom.project.getPaths().forEach (projectPath) =>
       try
-        data = JSON.parse(fs.readFileSync(@getSavePath(projectPath), 'utf8'))
+        buffer = zlib.inflateSync(fs.readFileSync(@getSavePath(projectPath)))
+        data = JSON.parse(buffer.toString('utf8'))
         if data?.length
           @paths = if @paths then @paths.concat(data) else data
+
+  cleanupOldFiles: ->
+    basePath = @getBaseSavePath()
+    fs.readdir basePath, (err, files) =>
+      if err || !files
+        return
+      files.forEach (file) => 
+        filePath = path.join(basePath, file)
+        fs.stat filePath, (err, stats) =>
+          if err || !stats
+            return
+          fileAgeDays = (Date.now() - stats.ctime) / 1000 / 3600 / 24
+          if (fileAgeDays > 30)
+            fs.unlink filePath, () =>
