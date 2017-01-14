@@ -5,7 +5,7 @@ Changes in this fork:
 :rocket: watching files with `fs.watch` instead of reloading everything on atom window focus  
 
 Limitations:  
-- doesn't work on Linux and in network shares, because of [fs.watch implementation](https://nodejs.org/docs/latest/api/fs.html#fs_caveats)
+:disappointed_relieved: doesn't work on Linux and in network shares, because of [fs.watch implementation](https://nodejs.org/docs/latest/api/fs.html#fs_caveats)  
 
 As long as the changes are not consistent across all OS, most probably this patch be accepted to fork, so let's leavt it here for now.
 
