@@ -3,7 +3,7 @@
   "version": "1.4.1",
   "main": "./lib/main",
   "description": "Open an editor to a file in the project with `cmd-t`.",
-  "repository": "https://github.com/antelle/fuzzy-finder",
+  "repository": "https://github.com/antelle/fuzzy-finder-with-faster-loading",
   "license": "MIT",
   "dependencies": {
     "async": "0.2.6",

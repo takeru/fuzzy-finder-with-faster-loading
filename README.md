@@ -1,5 +1,15 @@
-# Fuzzy Finder package
-[![OS X Build Status](https://travis-ci.org/atom/fuzzy-finder.svg?branch=master)](https://travis-ci.org/atom/fuzzy-finder) [![Windows Build Status](https://ci.appveyor.com/api/projects/status/b4b2dg5n9r1wdqad/branch/master?svg=true)](https://ci.appveyor.com/project/Atom/fuzzy-finder/branch/master) [![Dependency Status](https://david-dm.org/atom/fuzzy-finder.svg)](https://david-dm.org/atom/fuzzy-finder)
+# Fuzzy Finder with faster loading
+This is a fork of Atom [Fuzzy Finder](https://github.com/atom/fuzzy-finder) package.  
+Changes in this fork:  
+- project files caching: when you reopen a project, there's no need to wait for `Indexing...`
+- watching files with `fs.watch` instead of reloading everything on atom window focus
+
+Limitations:  
+- doesn't work on Linux and in network shares, because of [fs.watch implementation](https://nodejs.org/docs/latest/api/fs.html#fs_caveats)
+
+As long as the changes are not consistent across all OS, most probably this patch be accepted to fork, so let's leavt it here for now.
+
+## Original readme
 
 Quickly find and open files using <kbd>cmd-t</kbd>.
 
