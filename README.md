@@ -1,8 +1,8 @@
 # Fuzzy Finder with faster loading
 This is a fork of Atom [Fuzzy Finder](https://github.com/atom/fuzzy-finder) package.  
 Changes in this fork:  
-- project files caching: when you reopen a project, there's no need to wait for `Indexing...`
-- watching files with `fs.watch` instead of reloading everything on atom window focus
+:rocket: project files caching: when you reopen a project, there's no need to wait for `Indexing...`  
+:rocket: watching files with `fs.watch` instead of reloading everything on atom window focus  
 
 Limitations:  
 - doesn't work on Linux and in network shares, because of [fs.watch implementation](https://nodejs.org/docs/latest/api/fs.html#fs_caveats)
