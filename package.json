@@ -1,8 +1,8 @@
 {
   "name": "fuzzy-finder-with-faster-loading",
-  "version": "1.4.1",
+  "version": "0.0.0",
   "main": "./lib/main",
-  "description": "Open an editor to a file in the project with `cmd-t`.",
+  "description": "Open an editor to a file in the project with `cmd-t` (speed-improved fork).",
   "repository": "https://github.com/antelle/fuzzy-finder-with-faster-loading",
   "license": "MIT",
   "dependencies": {
