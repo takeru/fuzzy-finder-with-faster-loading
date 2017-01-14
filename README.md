@@ -7,7 +7,7 @@ Changes in this fork:
 Limitations:  
 :disappointed_relieved: doesn't work on Linux and in network shares, because of [fs.watch implementation](https://nodejs.org/docs/latest/api/fs.html#fs_caveats)  
 
-As long as the changes are not consistent across all OS, most probably this patch be accepted to fork, so let's leavt it here for now.
+As long as these changes are not consistent across all OS, most probably this patch will not be accepted to upstream, so let's leave it here for now. But I'd be happy to collaborate.
 
 ## Original readme
 
