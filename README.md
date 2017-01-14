@@ -4,15 +4,15 @@ Changes in this fork:
 :rocket: project files caching: when you reopen a project, there's no need to wait for `Indexing...`  
 :rocket: watching files with `fs.watch` instead of reloading everything on atom window focus  
 
-Limitations:  
+As long as these changes are not consistent across all OS, most probably this patch will not be accepted to upstream, so let's leave it here for now. But I'd be happy to collaborate.
+
+## Limitations
 :disappointed_relieved: doesn't work on Linux and in network shares, because of [fs.watch implementation](https://nodejs.org/docs/latest/api/fs.html#fs_caveats)  
 
-Installation:  
+## Installation
 1. install this package  
 2. disable fuzzy-finder (Settings / Packages / Core Packages / fuzzy-finder)  
 3. enjoy  
-
-As long as these changes are not consistent across all OS, most probably this patch will not be accepted to upstream, so let's leave it here for now. But I'd be happy to collaborate.
 
 ## Original readme
 
